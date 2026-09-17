@@ -1,0 +1,2 @@
+﻿input_station_records_total;input_station_delivery_events;input_sap_records_total;input_sap_active_deliveries;input_sap_sto_deliveries;matched_count;exceptions_count;incidents_count;total_station_volume_liters;total_sap_active_volume_liters;matched_volume_liters;reconciliation_rate_pct
+138;47;49;48;1;44;4;1;861000.0;867000.0;810000.0;94.07665505226481

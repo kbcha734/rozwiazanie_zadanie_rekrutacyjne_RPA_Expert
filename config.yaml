@@ -1,0 +1,81 @@
+# ==============================================================================
+# KONFIGURACJA ROZWIĄZANIA UZGODNIENIA DOSTAW PALIW (KONTROLING SIECI)
+# ==============================================================================
+# Parametry biznesowe można modyfikować bez konieczności ingerencji w kod silnika.
+
+# ------------------------------------------------------------------------------
+# 1. ŚCIEŻKI DO PLIKÓW WEJŚCIOWYCH I WYJŚCIOWYCH
+# ------------------------------------------------------------------------------
+paths:
+  input_dir: "dane_zadanie_praktyczne"
+  stations_file: "stacje_raport_dobowy.csv"
+  sap_file: "sap_dostawy.csv"
+  output_dir: "output"
+
+# ------------------------------------------------------------------------------
+# 2. REGUŁY TOLERANCJI ILOŚCIOWEJ
+# Zgodnie z wytycznymi: różnica do 50 litrów albo 0.5% dostawy (co większe) = zgodność.
+# ------------------------------------------------------------------------------
+tolerance:
+  abs_liters: 50.0       # Tolerancja bezwzględna w litrach (np. 50.0 l)
+  rel_percent: 0.005     # Tolerancja względna (0.005 = 0.5% dostawy)
+  use_max_base: true     # Baza procentowa: max(ilość_stacja, ilość_sap)
+
+# ------------------------------------------------------------------------------
+# 3. OBSŁUGA SPECJALNYCH PRZYPADKÓW BIZNESOWYCH
+# ------------------------------------------------------------------------------
+business_rules:
+  # Przesunięcie daty po północy (D+1 w SAP):
+  enable_date_shift_matching: true
+  date_shift_max_days: 1   # Dopuszczalne przesunięcie księgowania w SAP (dni)
+
+  # Agregacja wielu dokumentów w ramach tej samej stacji, doby i produktu:
+  allow_multi_document_aggregation: true
+
+  # Obsługa dokumentów SAP ze statusem STO (storno / anulowane):
+  ignore_sto_as_active_delivery: true  # STO nie liczy się jako aktywna dostawa
+  flag_station_reception_with_sto: true # Ale przyjęcie przez stację raportowane jako wyjątek
+
+  # Wykrywanie podejrzenia błędnego przypisania zakładu/stacji (Cross-station match):
+  enable_cross_station_correlation: true
+
+# ------------------------------------------------------------------------------
+# 4. SŁOWNIK MAPOWANIA PRODUKTÓW (KANONICZNE KODY)
+# Mapuje różne zapisy ze stacji i SAP na jednolity identyfikator produktu.
+# ------------------------------------------------------------------------------
+product_mapping:
+  # Benzyna 95
+  "PB95": "PB95"
+  "PB 95": "PB95"
+  "PB95 ": "PB95"
+  "Pb 95": "PB95"
+  "BENZYNA BEZOŁOWIOWA 95": "PB95"
+
+  # Benzyna 98
+  "PB98": "PB98"
+  "PB 98": "PB98"
+  "PB98 ": "PB98"
+  "BENZYNA BEZOŁOWIOWA 98": "PB98"
+
+  # Olej napędowy
+  "ON": "ON"
+  "ON ": "ON"
+  "DIESEL": "ON"
+  "OLEJ NAPĘDOWY": "ON"
+
+  # Autogaz LPG
+  "LPG": "LPG"
+  "LPG ": "LPG"
+  "GAZ LPG": "LPG"
+
+# ------------------------------------------------------------------------------
+# 5. PARAMETRY NORMALIZACJI KODÓW STACJI I DAT
+# ------------------------------------------------------------------------------
+normalization:
+  station_code_length: 4         # Dopełnienie zerami wiodącymi (np. 417 -> 0417)
+  station_sap_prefix: "ST"       # Prefiks do usunięcia w kodzie zakładu SAP (ST0412 -> 0412)
+  supported_date_formats:
+    - "%Y-%m-%d"
+    - "%d.%m.%Y"
+    - "%Y/%m/%d"
+    - "%d/%m/%Y"

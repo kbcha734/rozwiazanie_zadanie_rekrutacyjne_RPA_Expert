@@ -1,0 +1,16 @@
+# Pliki tymczasowe i archiwa
+*.zip
+*.pdf
+scratch/
+
+# Notatki wewnętrzne kandydata (ściąga do obrony)
+dokumentacja/przygotowanie_do_obrony.md
+RPA_Expert_HOMEWORK_dla_Kandydata_FINAL_v3.docx
+
+# Środowisko Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
